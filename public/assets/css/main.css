@@ -13,7 +13,11 @@ TABLE CONTENT
  Offcanvas Sidebar
  Search form
  Main header
+<<<<<<< HEAD
  Mega menu  
+=======
+ Mega menu
+>>>>>>> b601710df483e0452727fb51649270af9a35d604
  Header layouts
  Page layouts
  Pagination
@@ -1479,6 +1483,10 @@ p {
 .datepicker table tr td.focused {
   color: var(--bs-color-black);
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> b601710df483e0452727fb51649270af9a35d604
 .box-calendar-date {
   padding: 10px 15px;
   position: relative;
@@ -1500,8 +1508,12 @@ p {
   background-repeat: no-repeat;
   position: absolute;
   right: 10px;
+<<<<<<< HEAD
   top: 50%;
   transform: translateY(-50%);
+=======
+  top: 20px;
+>>>>>>> b601710df483e0452727fb51649270af9a35d604
   border: 0px;
 }
 
@@ -1696,7 +1708,11 @@ h4 {
   width: 30px;
   height: 30px;
   /* border: 3px solid #235922; */
+<<<<<<< HEAD
   /* border-radius: 50%; */
+=======
+  border-radius: 50%;
+>>>>>>> b601710df483e0452727fb51649270af9a35d604
   display: inline-block;
   position: relative;
   box-sizing: border-box;
@@ -3173,7 +3189,11 @@ label {
 .card-popular .card-image img {
   display: block;
   width: 100%;
+<<<<<<< HEAD
   height: auto;
+=======
+  height: 300px;
+>>>>>>> b601710df483e0452727fb51649270af9a35d604
 }
 
 .card-popular .card-info .card-title {
@@ -5705,7 +5725,11 @@ label {
   display: flex;
   padding: 0px;
   align-items: center;
+<<<<<<< HEAD
   justify-content: right;
+=======
+  justify-content: center;
+>>>>>>> b601710df483e0452727fb51649270af9a35d604
   text-align: left;
 }
 
@@ -9435,7 +9459,11 @@ a.icon-socials:hover svg path {
   padding-top: 300px;
 }
 
+<<<<<<< HEAD
 /* .block-banner-home1 .bg-shape::before {
+=======
+.block-banner-home1 .bg-shape::before {
+>>>>>>> b601710df483e0452727fb51649270af9a35d604
   content: "";
   position: absolute;
   top: 0px;
@@ -9446,7 +9474,11 @@ a.icon-socials:hover svg path {
   background-repeat: no-repeat;
   background-position: top center;
   background-size: cover;
+<<<<<<< HEAD
 } */
+=======
+}
+>>>>>>> b601710df483e0452727fb51649270af9a35d604
 
 .block-banner-home1 .bg-shape::after {
   content: "";
@@ -9454,7 +9486,11 @@ a.icon-socials:hover svg path {
   top: 0px;
   left: 0px;
   width: 100%;
+<<<<<<< HEAD
   height: 100vh;
+=======
+  height: 100%;
+>>>>>>> b601710df483e0452727fb51649270af9a35d604
   opacity: 0.6;
   background: #000;
 }
@@ -11115,7 +11151,11 @@ a.icon-socials:hover svg path {
   border-radius: 16px;
   background-color: var(--bs-neutral-0);
   padding: 21px 0px;
+<<<<<<< HEAD
   margin-top: 0px;
+=======
+  margin-top: 28px;
+>>>>>>> b601710df483e0452727fb51649270af9a35d604
   display: flex;
   align-items: flex-end;
 }
@@ -12742,8 +12782,12 @@ a.icon-socials:hover svg path {
   .top-bar-2 .text-header-info a {
     margin-right: 14px;
     width: 17px;
+<<<<<<< HEAD
     display: flex;
     justify-content: space-between;
+=======
+    display: inline-block;
+>>>>>>> b601710df483e0452727fb51649270af9a35d604
     overflow: hidden;
     height: 20px;
     line-height: 17px;
@@ -14605,10 +14649,17 @@ a.icon-socials:hover svg path {
 
 .loader-blur-bg {
   position: absolute;
+<<<<<<< HEAD
   width: 100vw;
   height: 100vh;
   backdrop-filter: blur(10px);
   background: rgb(255 255 255);
+=======
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(4px);
+  background: rgba(255, 255, 255, 0.5);
+>>>>>>> b601710df483e0452727fb51649270af9a35d604
   z-index: -1;
 }
 
@@ -14616,6 +14667,7 @@ a.icon-socials:hover svg path {
   width: 300px;
   height: auto;
 }
+<<<<<<< HEAD
 
 /* enquiry now */
 
@@ -15037,3 +15089,5 @@ a.icon-socials:hover svg path {
     max-width: 100%;
   }
 }
+=======
+>>>>>>> b601710df483e0452727fb51649270af9a35d604
