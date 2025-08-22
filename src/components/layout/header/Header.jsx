@@ -14,19 +14,22 @@ export default function Header({ scroll }) {
     >
       <div className="top-bar top-bar-2 top-bar-3 bg-transparent">
         <div className="container-fluid">
-          <div className="text-header-info d-flex align-items-center">
+          <div className="text-header-info d-flex align-items-center justify-content-between">
             <a className="phone-head text-white" href="#">
-              {/* SVG phone icon */}
-              <span className="d-none d-lg-inline-block">+1 222-555-33-99</span>
+              <span className="d-none d-lg-inline-block">+918208321149</span>
             </a>
-            <a className="email-head text-white" href="#">
-              {/* SVG email icon */}
-              <span className="d-none d-lg-inline-block">
-                maharastra@cabs.com
-              </span>
-            </a>
-            <div className="top-button-mode">
-              <ThemeSwitch />
+          </div>
+          <div className="text-header-info d-flex align-items-center justify-content-between">
+            {/* Right Side → Email + Theme Switch */}
+            <div className="d-flex align-items-center">
+              <a className="email-head text-white me-4" href="#">
+                <span className="d-none d-lg-inline-block">
+                  contact@maharashtracabs.com
+                </span>
+              </a>
+              <div className="top-button-mode">
+                <ThemeSwitch />
+              </div>
             </div>
           </div>
         </div>
@@ -38,7 +41,25 @@ export default function Header({ scroll }) {
             className="mobile-menu-toggle d-block d-md-none"
             onClick={handleMobileMenu}
           >
-            {/* Burger icon */}
+            <span className="burger-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="lucide lucide-menu-icon lucide-menu"
+                style={{ marginTop: "8px" }}
+              >
+                <path d="M4 12h16" />
+                <path d="M4 18h16" />
+                <path d="M4 6h16" />
+              </svg>
+            </span>
           </button>
 
           <div className="header-left">
@@ -72,7 +93,7 @@ export default function Header({ scroll }) {
                   </li>
                   <li>
                     <Link className="color-white" to="/career">
-                      Careers
+                      Gallery
                     </Link>
                   </li>
                   <li>
@@ -100,7 +121,7 @@ export default function Header({ scroll }) {
                   <Link to="/book-a-ride">Book A Ride</Link>
                 </li>
                 <li>
-                  <Link to="/career">Careers</Link>
+                  <Link to="/career">Gallery</Link>
                 </li>
                 <li>
                   <Link to="/blog-list">Blog</Link>

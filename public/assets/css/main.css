@@ -13,7 +13,7 @@ TABLE CONTENT
  Offcanvas Sidebar
  Search form
  Main header
- Mega menu
+ Mega menu  
  Header layouts
  Page layouts
  Pagination
@@ -3173,7 +3173,7 @@ label {
 .card-popular .card-image img {
   display: block;
   width: 100%;
-  height: 300px;
+  height: auto;
 }
 
 .card-popular .card-info .card-title {
@@ -5705,7 +5705,7 @@ label {
   display: flex;
   padding: 0px;
   align-items: center;
-  justify-content: center;
+  justify-content: right;
   text-align: left;
 }
 
@@ -12742,7 +12742,8 @@ a.icon-socials:hover svg path {
   .top-bar-2 .text-header-info a {
     margin-right: 14px;
     width: 17px;
-    display: inline-block;
+    display: flex;
+    justify-content: space-between;
     overflow: hidden;
     height: 20px;
     line-height: 17px;
@@ -14884,5 +14885,155 @@ a.icon-socials:hover svg path {
 @media (max-width: 992px) {
   .book-ride-details .counter-box {
     margin-bottom: 15px;
+  }
+}
+
+.top-offers-overview p,
+.top-offers-overview ul,
+.top-offers-overview li {
+  font-family: var(--urbanist);
+}
+
+/* Gallery */
+.gallery-section .gallery-banner {
+  height: 400px;
+  object-fit: cover;
+}
+
+.gallery-section .search-box {
+  position: relative;
+}
+
+.gallery-section .search-icon {
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
+  z-index: 2;
+}
+
+.gallery-section .search-input {
+  padding-left: 45px;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.gallery-section .search-input:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.gallery-section .gallery-card {
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.gallery-section .gallery-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15) !important;
+}
+
+.gallery-section .gallery-image-container {
+  overflow: hidden;
+  height: 300px;
+}
+
+.gallery-section .gallery-image {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  transition: all 0.4s ease;
+}
+
+.gallery-section .gallery-card:hover .gallery-image {
+  transform: scale(1.1);
+}
+
+.gallery-section .gallery-overlay {
+  background: rgba(0, 0, 0, 0.7);
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.gallery-section .gallery-card:hover .gallery-overlay {
+  opacity: 1;
+}
+
+.gallery-section .overlay-content {
+  transform: translateY(20px);
+  transition: all 0.3s ease;
+}
+
+.gallery-section .gallery-card:hover .overlay-content {
+  transform: translateY(0);
+}
+
+.gallery-section .gallery-controls .card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+}
+
+.gallery-section .gallery-dropdown-menu {
+  border: none;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  border-radius: 12px;
+  padding: 10px 0;
+  min-width: 180px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.gallery-section .gallery-dropdown .dropdown-item {
+  padding: 12px 20px;
+  transition: all 0.2s ease;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+}
+
+.gallery-section .gallery-dropdown .dropdown-item:hover,
+.gallery-section .gallery-dropdown .dropdown-item:focus {
+  background-color: #f8f9fa;
+  transform: translateX(5px);
+}
+
+.gallery-section .gallery-dropdown .dropdown-item.active {
+  background-color: #0d6efd;
+  color: white;
+}
+
+.gallery-section .results-count .badge {
+  border-radius: 25px;
+}
+
+@media (max-width: 768px) {
+  .gallery-section .gallery-banner {
+    height: 250px;
+  }
+
+  .gallery-section .display-4 {
+    font-size: 2rem !important;
+  }
+
+  .gallery-section .gallery-image-container {
+    height: 250px;
+  }
+
+  .gallery-section .gallery-controls .row > div {
+    margin-bottom: 1rem;
+  }
+
+  .gallery-section .results-count {
+    text-align: left !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .gallery-section .col-lg-8,
+  .gallery-section .col-lg-4 {
+    flex: 0 0 100%;
+    max-width: 100%;
   }
 }

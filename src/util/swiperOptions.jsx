@@ -4,14 +4,17 @@ export const swiperGroup4 = {
   modules: [Autoplay, Pagination, Navigation],
   spaceBetween: 30,
   slidesPerView: 4,
-  slidesPerGroup: 2,
+  slidesPerGroup: 1,
   loop: true,
+  speed: 600,
   navigation: {
     nextEl: ".swiper-button-next",
     prevEl: ".swiper-button-prev",
   },
   autoplay: {
-    delay: 10000,
+    delay: 3000,
+    disableOnInteraction: false,
+    pauseOnMouseEnter: false,
   },
   breakpoints: {
     1199: {
@@ -43,7 +46,7 @@ export const swiperGroup3 = {
     prevEl: ".swiper-button-prev",
   },
   autoplay: {
-    delay: 10000,
+    delay: 2000,
   },
   breakpoints: {
     1199: {
@@ -60,6 +63,7 @@ export const swiperGroup3 = {
     },
   },
 };
+
 export const swiperGroup2 = {
   modules: [Autoplay, Pagination, Navigation],
   slidesPerView: 2,
@@ -71,7 +75,7 @@ export const swiperGroup2 = {
     prevEl: ".swiper-button-prev-2",
   },
   autoplay: {
-    delay: 10000,
+    delay: 2000,
   },
   breakpoints: {
     1199: {
@@ -103,7 +107,7 @@ export const swiperGroup1 = {
     clickable: true,
   },
   autoplay: {
-    delay: 100000,
+    delay: 2000,
   },
 };
 
@@ -119,7 +123,7 @@ export const swiperGroupAnimate = {
     prevEl: ".swiper-button-prev-animate",
   },
   autoplay: {
-    delay: 10000,
+    delay: 1000,
   },
   breakpoints: {
     1199: {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Container, Row, Col, Button, Form } from "react-bootstrap";
 import {
   FaCar,
@@ -12,70 +12,99 @@ import Layout from "../components/layout/Layout";
 import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import HeroSearch from "../components/elements/HeroSearch";
+import axios from "axios";
 
 const BookRideDetails = () => {
   const [selectedCabType, setSelectedCabType] = useState("ALL");
   const [showMoreInfo, setShowMoreInfo] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [cabs, setCabs] = useState([]);
   const { "from-to": fromTo } = useParams();
   const [pickup, drop] = fromTo?.split("-to-") || [];
 
-  const cabTypes = [
-    { id: "ALL", label: "ALL" },
-    { id: "HATCHBACK", label: "HATCHBACK" },
-    { id: "SEDAN", label: "SEDAN" },
-    { id: "SUV", label: "SUV" },
-    { id: "PREMIUM_SUV", label: "PREMIUM SUV" },
-  ];
+  const formatCity = (value) =>
+    decodeURIComponent((value || "").replace(/-/g, " "))
+      .trim()
+      .replace(/\s+/g, " ")
+      .replace(/\b\w/g, (c) => c.toUpperCase());
 
-  const cabOptions = [
-    {
-      id: 1,
-      image:
-        "https://res.cloudinary.com/dc1kofim7/image/upload/v1705680155/mansi_hatchback_pp2nmq.jpg",
-      type: "HATCHBACK",
-      name: "Affordable Cab",
-      models: "Swift, Indica",
-      includedKm: 100,
-      rateAfter: 13,
-      cancellation: "Free cancellation until 6 hours before pickup",
-      reservePrice: 639,
-      originalPrice: 3619,
-      discountedPrice: 2398,
-      features: [
-        "Safety Standards & Protection",
-        "Partial Payment",
-        "First Kit (Safety Status)",
-      ],
-      contactNumbers: ["+91 84-84-84-6395", "+91 85-85-85-7798"],
-      available: 2407,
-    },
-    {
-      id: 2,
-      image:
-        "https://res.cloudinary.com/dc1kofim7/image/upload/v1705680155/mansi_hatchback_pp2nmq.jpg",
-      type: "SEDAN",
-      name: "Comfortable Cab",
-      models: "Dzire, Toyota Etios",
-      includedKm: 100,
-      rateAfter: 15,
-      cancellation: "Free cancellation until 6 hours before pickup",
-      reservePrice: 639,
-      originalPrice: 2949,
-      discountedPrice: 2517,
-      features: [
-        "Safety Standards & Protection",
-        "Partial Payment",
-        "First Kit (Safety Status)",
-      ],
-      contactNumbers: ["+91 84-84-84-6395", "+91 85-85-85-7798"],
-      available: 2407,
-    },
-  ];
+  const pickupLabel = formatCity(pickup);
+  const dropLabel = formatCity(drop);
+
+  const cabTypes = [{ id: "ALL", label: "ALL" }].concat(
+    Array.from(new Set(cabs.map((c) => (c.car_type || "").toUpperCase())))
+      .filter(Boolean)
+      .map((type) => ({ id: type, label: type.replace(/_/g, " ") }))
+  );
+
+  useEffect(() => {
+    let isMounted = true;
+    setLoading(true);
+    setError(false);
+
+    const fetchCabs = async () => {
+      try {
+        const response = await axios.get(
+          "https://maharashtracabs.com/maharashtracab_backend/api/cms/home"
+        );
+        const raw = Array.isArray(response.data?.data?.cabs)
+          ? response.data.data.cabs
+          : [];
+
+        const normalizedPickup = pickupLabel.toLowerCase();
+        const normalizedDrop = dropLabel.toLowerCase();
+
+        const filtered = raw.filter((item) => {
+          const p = String(item.pick_location || "").toLowerCase();
+          const d = String(item.drop_location || "").toLowerCase();
+          return p.includes(normalizedPickup) && d.includes(normalizedDrop);
+        });
+
+        if (!isMounted) return;
+        setCabs(filtered);
+      } catch (err) {
+        if (!isMounted) return; 
+        setError(true);
+        setCabs([]);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    fetchCabs();
+    return () => {
+      isMounted = false;
+    };
+  }, [pickupLabel, dropLabel]);
+
+  const mappedCabs = cabs.map((c) => ({
+    id: c.id,
+    image: c.car_image?.startsWith("http")
+      ? c.car_image
+      : c.car_image
+      ? `https://maharashtracabs.com/maharashtracab_backend/public/${c.car_image}`
+      : "",
+    type: (c.car_type || "").toUpperCase(),
+    name: c.car_name || "Cab",
+    models: typeof c.car_luxury === "string" ? c.car_luxury : "",
+    cancellation:
+      typeof c.cancellation === "string"
+        ? c.cancellation
+        : c.cancellation
+        ? "Free cancellation available"
+        : "",
+    contactNumbers: [c.contact_no].filter(Boolean),
+    whatsapp: c.whatsapp_no,
+    available: c.available,
+    shortDetails: c.short_details,
+    moreDetails: c.more_details,
+  }));
 
   const filteredCabs =
     selectedCabType === "ALL"
-      ? cabOptions
-      : cabOptions.filter((cab) => cab.type === selectedCabType);
+      ? mappedCabs
+      : mappedCabs.filter((cab) => cab.type === selectedCabType);
 
   return (
     <Layout headerStyle={1}>
@@ -98,7 +127,7 @@ const BookRideDetails = () => {
                         />
                         <div>
                           <small className="text-muted">Pickup</small>
-                          <div className="fw-medium">{pickup}</div>
+                          <div className="fw-medium">{pickupLabel}</div>
                         </div>
                       </div>
 
@@ -109,7 +138,7 @@ const BookRideDetails = () => {
                         />
                         <div>
                           <small className="text-muted">Drop</small>
-                          <div className="fw-medium">{drop}</div>
+                          <div className="fw-medium">{dropLabel}</div>
                         </div>
                       </div>
                     </div>
@@ -120,7 +149,6 @@ const BookRideDetails = () => {
                       <FaPhone className="me-2 text-primary" size={18} />
                       <div>
                         <div className="fw-medium">+91 84-84-84-6395</div>
-                        <div className="fw-medium">+91 85-85-85-7798</div>
                       </div>
                     </div>
                     <div className="badge bg-info text-dark px-3 py-2">
@@ -152,6 +180,33 @@ const BookRideDetails = () => {
               </Col>
             </Row>
 
+            {loading && (
+              <div className="text-center py-5">
+                <div
+                  className="spinner-border text-primary mb-3"
+                  role="status"
+                  style={{ width: "3rem", height: "3rem" }}
+                >
+                  <span className="visually-hidden">Loading...</span>
+                </div>
+                <h5 className="text-muted">Finding the best cabs for you...</h5>
+              </div>
+            )}
+
+            {!loading && filteredCabs.length === 0 && (
+              <Row className="mt-4">
+                <Col>
+                  <div className="background-card p-4 rounded-3 text-center">
+                    <h5 className="neutral-1000 mb-2">No cars available</h5>
+                    <p className="neutral-500 mb-0">
+                      We couldn't find cars for {pickupLabel} to {dropLabel}.
+                      Try adjusting locations or dates.
+                    </p>
+                  </div>
+                </Col>
+              </Row>
+            )}
+
             <Row>
               {filteredCabs.map((cab) => (
                 <Col md={6} key={cab.id} className="mb-4">
@@ -160,7 +215,9 @@ const BookRideDetails = () => {
                       <div className="d-flex align-items-center">
                         <div>
                           <h5 className="fw-bold mb-0">{cab.type}</h5>
-                          <small className="text-muted">{cab.models}</small>
+                          {cab.models && (
+                            <small className="text-muted">{cab.models}</small>
+                          )}
                         </div>
                       </div>
 
@@ -182,38 +239,40 @@ const BookRideDetails = () => {
                       <div className="d-flex justify-content-between align-items-center mb-3">
                         <div>
                           <h6 className="fw-bold">{cab.name}</h6>
-                          <small className="text-muted">
-                            {cab.includedKm} km included. After that ₹
-                            {cab.rateAfter}/km
-                          </small>
+                          {typeof cab.available !== "undefined" && (
+                            <small className="text-muted">
+                              Available: {cab.available}
+                            </small>
+                          )}
                         </div>
                         <div className="bg-primary bg-opacity-10 p-2 rounded">
                           <small className="d-block text-primary fw-bold">
-                            Reserve at
+                            Contact
                           </small>
                           <div className="text-primary fw-bold">
-                            ₹{cab.reservePrice}
+                            {cab.contactNumbers[0] || "N/A"}
                           </div>
                         </div>
                       </div>
 
-                      <div className="d-flex align-items-center mb-3">
-                        <FaShieldAlt className="me-2 text-success" />
-                        <small className="text-success">
-                          {cab.cancellation}
-                        </small>
-                      </div>
+                      {cab.cancellation && (
+                        <div className="d-flex align-items-center mb-3">
+                          <FaShieldAlt className="me-2 text-success" />
+                          <small className="text-success">
+                            {cab.cancellation}
+                          </small>
+                        </div>
+                      )}
 
                       <div className="mb-3">
-                        {cab.features.map((feature, idx) => (
+                        {cab.shortDetails && (
                           <div
-                            key={idx}
-                            className="d-flex align-items-center mb-1"
-                          >
-                            <span className="bullet me-2">•</span>
-                            <small>{feature}</small>
-                          </div>
-                        ))}
+                            className="small"
+                            dangerouslySetInnerHTML={{
+                              __html: cab.shortDetails,
+                            }}
+                          />
+                        )}
 
                         <span
                           role="button"
@@ -238,20 +297,19 @@ const BookRideDetails = () => {
                         </span>
                       </div>
 
-                      {/* Pricing */}
                       <div className="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
                         <div>
-                          <div className="text-decoration-line-through text-muted">
-                            ₹{cab.originalPrice}
-                          </div>
-                          <div className="h4 fw-bold">
-                            ₹{cab.discountedPrice}
-                          </div>
+                          <div className="small text-muted">Type</div>
+                          <div className="fw-bold">{cab.type}</div>
                         </div>
                         <Link
                           className="px-4 py-2 rounded-pill"
                           style={{ backgroundColor: "orange" }}
-                          to="https://wa.me/9370098337"
+                          to={
+                            cab.whatsapp
+                              ? `https://wa.me/${cab.whatsapp}`
+                              : `https://wa.me/${cab.contactNumbers[0] || ""}`
+                          }
                           target="_blank"
                           rel="noopener noreferrer"
                         >
@@ -275,16 +333,20 @@ const BookRideDetails = () => {
                           </Button>
                         </div>
 
-                        <div className="mb-2">
-                          <small className="text-muted">Contact Numbers:</small>
-                          <div>
-                            {cab.contactNumbers.map((num, idx) => (
-                              <div key={idx} className="fw-medium">
-                                {num}
-                              </div>
-                            ))}
+                        {cab.contactNumbers.length > 0 && (
+                          <div className="mb-2">
+                            <small className="text-muted">
+                              Contact Numbers:
+                            </small>
+                            <div>
+                              {cab.contactNumbers.map((num, idx) => (
+                                <div key={idx} className="fw-medium">
+                                  {num}
+                                </div>
+                              ))}
+                            </div>
                           </div>
-                        </div>
+                        )}
 
                         <div>
                           <small className="text-muted">
@@ -293,17 +355,19 @@ const BookRideDetails = () => {
                           <div className="fw-medium">{cab.available}</div>
                         </div>
 
-                        <div className="mt-3">
-                          <small className="d-block text-muted">
-                            Features:
-                          </small>
-                          <ul className="small ps-3 mb-0">
-                            <li>AC and Non-AC options available</li>
-                            <li>24/7 customer support</li>
-                            <li>Live GPS tracking</li>
-                            <li>Professional drivers</li>
-                          </ul>
-                        </div>
+                        {cab.moreDetails && (
+                          <div className="mt-3">
+                            <small className="d-block text-muted">
+                              Details:
+                            </small>
+                            <div
+                              className="small"
+                              dangerouslySetInnerHTML={{
+                                __html: cab.moreDetails,
+                              }}
+                            />
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>

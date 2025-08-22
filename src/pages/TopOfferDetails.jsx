@@ -18,7 +18,7 @@ const TopOfferDetails = () => {
       try {
         startLoading();
         const res = await axios.get(
-          "https://teal-sparrow-187679.hostingersite.com/maharashtracabs/api/cms/home"
+          "https://maharashtracabs.com/maharashtracab_backend/api/cms/home"
         );
 
         const allOffers = res.data.data.top_offer || [];
@@ -28,13 +28,12 @@ const TopOfferDetails = () => {
           .map((item) => ({
             ...item,
             slug: item.title.toLowerCase().replace(/\s+/g, "-"),
-            image: `https://teal-sparrow-187679.hostingersite.com/maharashtracabs/public/${item.image}`,
+            image: `https://maharashtracabs.com/maharashtracab_backend/public/${item.image}`,
           }));
 
         const selected = filtered.find((item) => item.slug === slug);
         setOffer(selected);
       } catch (error) {
-        console.error("Error fetching top offer details:", error);
       } finally {
         stopLoading();
       }

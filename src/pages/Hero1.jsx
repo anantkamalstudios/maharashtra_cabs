@@ -5,7 +5,7 @@ export default function Hero1({ section }) {
       <div
         className="bg-shape z-0"
         style={{
-          backgroundImage: `url(https://teal-sparrow-187679.hostingersite.com/maharashtracabs/public/${section.image})`,
+          backgroundImage: `url(https://maharashtracabs.com/maharashtracab_backend/public/${section.image})`,
           backgroundRepeat: "no-repeat",
           backgroundPosition: "top center",
           backgroundSize: "cover",
@@ -26,7 +26,7 @@ export default function Hero1({ section }) {
           <h1 className="color-white mb-35 wow fadeInUp">
             {section.sub_title}
           </h1>
-          <ul className="list-ticks-green">
+          <ul className="list-ticks-green d-none d-md-block">
             <li className="wow fadeInUp" data-wow-delay="0.1s">
               High quality at a low cost.
             </li>

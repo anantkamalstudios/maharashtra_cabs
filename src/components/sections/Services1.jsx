@@ -7,7 +7,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 const Services1 = ({ headerVisits, visits }) => {
   return (
     <div>
-      <section className="section-box box-properties-area pb-50 background-body">
+      <section className="section-box box-properties-area pb-50 background-body mt-50">
         <div className="container">
           <div className="row align-items-end mb-40">
             <div className="col-md-12">

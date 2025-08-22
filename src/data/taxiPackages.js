@@ -9,6 +9,14 @@ const taxiPackages = [
     slug: "mumbai-to-pune",
   },
   {
+    id: 1,
+    image: "/assets/imgs/cars-listing/cars-listing-1/t1.jpg",
+    title: "Mumbai to Pune",
+    subtitle: "Flat 20% Off on Round Trip",
+    url: "/cars-details-1",
+    slug: "sample",
+  },
+  {
     id: 2,
     image: "/assets/imgs/cars-listing/cars-listing-1/t2.jpg",
     title: "Delhi to Agra",

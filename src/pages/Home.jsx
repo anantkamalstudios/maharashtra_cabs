@@ -17,7 +17,7 @@ import { useLoading } from "../context/LoadingContext";
 import useHome from "../hooks/useHome";
 import { RingLoader } from "react-spinners";
 
-// https://teal-sparrow-187679.hostingersite.com/maharashtracabs/api/cms/home
+// https://maharashtracabs.com/maharashtracab_backend/api/cms/home
 // https://teal-sparrow-187679.hostingersite.com/maharashtracabs/public
 export default function Home() {
   const { data, loading, error } = useHome();
@@ -48,6 +48,7 @@ export default function Home() {
   const testimonialRaw = data?.testimonial || [];
   const faqRaw = data?.faq || [];
   const calciRaw = data?.rent_calculate || [];
+ 
 
   const topOffers = topOffersRaw
     .filter((item) => item.heading === null && item.title)
@@ -58,12 +59,29 @@ export default function Home() {
     }));
 
   const taxiPackages = taxiPackagesRaw
-    .filter((item) => item.heading === null && item.title)
-    .map((item) => ({
-      ...item,
-      slug: item.title.toLowerCase().replace(/\s+/g, "-"),
-      image: `https://maharashtracabs.com/maharashtracab_backend/public/${item.image}`,
-    }));
+    .filter((item) => item.title !== null || item.heading !== null)
+    .filter(
+      (item) =>
+        (item.title && item.title.trim()) ||
+        (item.heading && item.heading.trim())
+    )
+    .map((item) => {
+      const resolvedTitle =
+        item.title && item.title.trim()
+          ? item.title
+          : item.heading || "Package";
+      const resolvedSubtitle = item.subtitle || item.paragraph || "";
+      const resolvedImage = item.image
+        ? `https://maharashtracabs.com/maharashtracab_backend/public/${item.image}`
+        : undefined;
+      return {
+        ...item,
+        title: resolvedTitle,
+        subtitle: resolvedSubtitle,
+        slug: resolvedTitle.toLowerCase().replace(/\s+/g, "-"),
+        image: resolvedImage,
+      };
+    });
 
   const headerEasyBooking = easyBookingRaw.find(
     (item) => item.heading !== null
@@ -80,7 +98,7 @@ export default function Home() {
     .filter((item) => item.heading === null && item.title)
     .map((item) => ({
       ...item,
-      slug: item.title.toLowerCase().replace(/\s+/g, "-"),
+      slug: item.slug || item.title.toLowerCase().replace(/\s+/g, "-"),
       image: `https://maharashtracabs.com/maharashtracab_backend/public/${item.image}`,
     }));
 
@@ -109,11 +127,11 @@ export default function Home() {
     <Layout headerStyle={1}>
       <Hero1 section={section1} />
       <Search1 />
-      <Brand1 />
+      <Services1 headerVisits={headerVisits} visits={visits} />
+      {/* <Brand1 /> */}
       <TopOffers topOffers={topOffers} />
       <TaxiPackage taxiPackages={taxiPackages} />
       <WhyUs1 headerEasyBooking={headerEasyBooking} easyBooking={easyBooking} />
-      <Services1 headerVisits={headerVisits} visits={visits} />
       <Cta2 calci={calci} />
       <Testimonials
         testimonials={testimonials}

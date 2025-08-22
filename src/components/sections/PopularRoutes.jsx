@@ -38,7 +38,7 @@ export default function PopularRoutes() {
               key={route.slug}
             >
               <Link
-                to={`/route/${route.slug}`}
+                to={`/book-a-ride/${route.slug}`}
                 className="text-decoration-none"
               >
                 <div className="card shadow-sm h-100">

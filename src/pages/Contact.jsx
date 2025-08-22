@@ -621,7 +621,7 @@ const Contact = () => {
                     </p>
                     <iframe
                       className="h-520 rounded-3"
-                      src="https://www.google.com/maps/embed?pb=!1m10!1m8!1m3!1d283661.3575233618!2d2.2296777857951824!3d47.16509219592609!3m2!1i1024!2i768!4f13.1!5e0!3m2!1svi!2s!4v1712486491620!5m2!1svi!2s"
+                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d38701.48206899499!2d73.7257585!3d20.004987449999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bddec7e572261f9%3A0x929cff8c6692b9d1!2sSatpur%20Colony%2C%20Nashik%2C%20Maharashtra!5e1!3m2!1sen!2sin!4v1755760380014!5m2!1sen!2sin"
                       width="100%"
                       height={650}
                       style={{ border: 0 }}

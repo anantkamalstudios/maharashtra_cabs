@@ -1,8 +1,73 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Layout from "../components/layout/Layout";
+import useHome from "../hooks/useHome";
+import { RingLoader } from "react-spinners";
 
 const BlogList = () => {
+  const { data, loading, error } = useHome();
+  const [searchTerm, setSearchTerm] = useState("");
+
+  if (loading) {
+    return (
+      <Layout footerStyle={1}>
+        <div
+          style={{
+            height: "100vh",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            background: "#fff",
+          }}
+        >
+          <RingLoader size={120} color="#3583e8ff" />
+        </div>
+      </Layout>
+    );
+  }
+
+  if (error) {
+    return (
+      <Layout footerStyle={1}>
+        <div className="container py-5">
+          <h2>Failed to load data. Please try again.</h2>
+        </div>
+      </Layout>
+    );
+  }
+
+  const blogsRaw = data?.blogs || [];
+  const filteredBlogs = blogsRaw.filter((blog) => {
+    const isVisible = blog.status === "published" || blog.status === "draft"; // ✅ Allow both
+
+    const matchesSearch =
+      searchTerm === "" ||
+      blog.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      blog.excerpt?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      blog.category?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    return isVisible && matchesSearch;
+  });
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString("en-US", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      });
+    } catch {
+      return "N/A";
+    }
+  };
+
+  const formatReadTime = (minutes) => {
+    if (!minutes) return "N/A";
+    return `${minutes} min${minutes > 1 ? "s" : ""}`;
+  };
+
   return (
     <div>
       <>
@@ -37,323 +102,112 @@ const BlogList = () => {
                       <div className="col-lg-8">
                         <h2 className="neutral-1000">Recent Posts</h2>
                         <p className="text-xl-medium neutral-500">
-                          Favorite vehicles based on customer reviews
+                          {filteredBlogs.length > 0
+                            ? `${filteredBlogs.length} article${
+                                filteredBlogs.length > 1 ? "s" : ""
+                              } found`
+                            : "No articles found"}
                         </p>
-                        <div className="box-grid-hotels box-grid-news mt-60 mb-50 wow fadeIn">
-                          <div className="card-flight card-news background-card">
-                            <div className="card-image">
-                              <Link to="/blog-details">
-                                <img
-                                  src="/assets/imgs/blog/blog-list/news.png"
-                                  alt="Maharashtra-cabs"
-                                />
-                              </Link>
-                            </div>
-                            <div className="card-info">
-                              <Link
-                                className="btn btn-label-tag background-3"
-                                to="#"
-                              >
-                                Adventure
-                              </Link>
-                              <div className="card-title">
-                                <Link
-                                  className="heading-6 neutral-1000"
-                                  to="/blog-details"
-                                >
-                                  A Guide to Renting Cars for Family Road Trips
-                                </Link>
-                              </div>
-                              <div className="card-meta">
-                                <span className="post-date neutral-1000">
-                                  18 Sep 2024
-                                </span>
-                                <span className="post-time neutral-1000">
-                                  6 mins
-                                </span>
-                                <span className="post-comment neutral-1000">
-                                  38 comments
-                                </span>
-                              </div>
-                              <div className="card-desc">
-                                <p className="text-md-medium neutral-500">
-                                  The dark wood paneling and furnishings, deluxe
-                                  red-draped four-poster bed, and magnificent
-                                  black
-                                </p>
-                              </div>
-                              <div className="card-program">
-                                <div className="endtime">
-                                  <div className="card-button">
-                                    <Link
-                                      className="btn btn-gray"
-                                      to="/blog-details"
-                                    >
-                                      Keep Reading
-                                    </Link>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
+
+                        {filteredBlogs.length === 0 ? (
+                          <div className="text-center py-5">
+                            <p className="text-muted">
+                              No blog posts found matching your search.
+                            </p>
                           </div>
-                          <div className="card-flight card-news background-card">
-                            <div className="card-image">
-                              <Link to="/blog-details">
-                                <img
-                                  src="/assets/imgs/blog/blog-list/news2.png"
-                                  alt="Maharashtra-cabs"
-                                />
-                              </Link>
-                            </div>
-                            <div className="card-info">
-                              <Link
-                                className="btn btn-label-tag background-1"
-                                to="#"
+                        ) : (
+                          <div className="box-grid-hotels box-grid-news mt-60 mb-50 wow fadeIn">
+                            {filteredBlogs.map((blog) => (
+                              <div
+                                className="card-flight card-news background-card mb-4"
+                                key={blog.id}
                               >
-                                Luxury
-                              </Link>
-                              <div className="card-title">
-                                <Link
-                                  className="heading-6 neutral-1000"
-                                  to="/blog-details"
-                                >
-                                  How to Avoid Hidden Fees When Renting a Car
-                                </Link>
-                              </div>
-                              <div className="card-meta">
-                                <span className="post-date neutral-1000">
-                                  18 Sep 2024
-                                </span>
-                                <span className="post-time neutral-1000">
-                                  6 mins
-                                </span>
-                                <span className="post-comment neutral-1000">
-                                  38 comments
-                                </span>
-                              </div>
-                              <div className="card-desc">
-                                <p className="text-md-medium neutral-500">
-                                  The dark wood paneling and furnishings, deluxe
-                                  red-draped four-poster bed, and magnificent
-                                  black
-                                </p>
-                              </div>
-                              <div className="card-program">
-                                <div className="endtime">
-                                  <div className="card-button">
-                                    <Link
-                                      className="btn btn-gray"
-                                      to="/blog-details"
-                                    >
-                                      Keep Reading
-                                    </Link>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="card-flight card-news background-card">
-                            <div className="card-image">
-                              <Link to="/blog-details">
-                                <img
-                                  src="/assets/imgs/blog/blog-list/news3.png"
-                                  alt="Maharashtra-cabs"
-                                />
-                              </Link>
-                            </div>
-                            <div className="card-info">
-                              <Link
-                                className="btn btn-label-tag background-2"
-                                to="#"
-                              >
-                                Wanderlust
-                              </Link>
-                              <div className="card-title">
-                                <Link
-                                  className="heading-6 neutral-1000"
-                                  to="/blog-details"
-                                >
-                                  Top Tips for Renting a Car During Peak Travel
-                                  Seasons
-                                </Link>
-                              </div>
-                              <div className="card-meta">
-                                <span className="post-date neutral-1000">
-                                  18 Sep 2024
-                                </span>
-                                <span className="post-time neutral-1000">
-                                  6 mins
-                                </span>
-                                <span className="post-comment neutral-1000">
-                                  38 comments
-                                </span>
-                              </div>
-                              <div className="card-desc">
-                                <p className="text-md-medium neutral-500">
-                                  The dark wood paneling and furnishings, deluxe
-                                  red-draped four-poster bed, and magnificent
-                                  black
-                                </p>
-                              </div>
-                              <div className="card-program">
-                                <div className="endtime">
-                                  <div className="card-button">
-                                    <Link
-                                      className="btn btn-gray"
-                                      to="/blog-details"
-                                    >
-                                      Keep Reading
-                                    </Link>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="card-flight card-news background-card">
-                            <div className="card-image">
-                              <Link to="/blog-details">
-                                <img
-                                  src="/assets/imgs/blog/blog-list/news4.png"
-                                  alt="Maharashtra-cabs"
-                                />
-                              </Link>
-                            </div>
-                            <div className="card-info">
-                              <Link
-                                className="btn btn-label-tag background-4"
-                                to="#"
-                              >
-                                Heritage
-                              </Link>
-                              <div className="card-title">
-                                <Link
-                                  className="heading-6 neutral-1000"
-                                  to="/blog-details"
-                                >
-                                  How to Choose the Best Insurance for Your
-                                  Rental Car
-                                </Link>
-                              </div>
-                              <div className="card-meta">
-                                <span className="post-date neutral-1000">
-                                  18 Sep 2024
-                                </span>
-                                <span className="post-time neutral-1000">
-                                  6 mins
-                                </span>
-                                <span className="post-comment neutral-1000">
-                                  38 comments
-                                </span>
-                              </div>
-                              <div className="card-desc">
-                                <p className="text-md-medium neutral-500">
-                                  The dark wood paneling and furnishings, deluxe
-                                  red-draped four-poster bed, and magnificent
-                                  black
-                                </p>
-                              </div>
-                              <div className="card-program">
-                                <div className="endtime">
-                                  <div className="card-button">
-                                    <Link
-                                      className="btn btn-gray"
-                                      to="/blog-details"
-                                    >
-                                      Keep Reading
-                                    </Link>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <nav aria-label="Page navigation example">
-                          <ul className="pagination">
-                            <li className="page-item">
-                              <Link
-                                className="page-link"
-                                to="#"
-                                aria-label="Previous"
-                              >
-                                <span aria-hidden="true">
-                                  <svg
-                                    width={12}
-                                    height={12}
-                                    viewBox="0 0 12 12"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
+                                <div className="card-image">
+                                  <Link
+                                    to={`/blog-details/${blog.slug}`}
+                                    state={{ slug: blog.slug }}
                                   >
-                                    <path
-                                      d="M6.00016 1.33325L1.3335 5.99992M1.3335 5.99992L6.00016 10.6666M1.3335 5.99992H10.6668"
-                                      stroke="white"
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
+                                    <img
+                                      src={
+                                        blog.cover_image
+                                          ? `https://maharashtracabs.com/maharashtracab_backend/public/${blog.cover_image}`
+                                          : "/assets/imgs/blog/blog-list/default-blog.jpg"
+                                      }
+                                      alt={blog.title || "Blog post"}
+                                      style={{
+                                        width: "100%",
+                                        height: "200px",
+                                        objectFit: "cover",
+                                      }}
                                     />
-                                  </svg>
-                                </span>
-                              </Link>
-                            </li>
-                            <li className="page-item">
-                              <Link className="page-link" to="#">
-                                1
-                              </Link>
-                            </li>
-                            <li className="page-item">
-                              <Link className="page-link active" to="#">
-                                2
-                              </Link>
-                            </li>
-                            <li className="page-item">
-                              <Link className="page-link" to="#">
-                                3
-                              </Link>
-                            </li>
-                            <li className="page-item">
-                              <Link className="page-link" to="#">
-                                4
-                              </Link>
-                            </li>
-                            <li className="page-item">
-                              <Link className="page-link" to="#">
-                                5
-                              </Link>
-                            </li>
-                            <li className="page-item">
-                              <Link className="page-link" to="#">
-                                ...
-                              </Link>
-                            </li>
-                            <li className="page-item">
-                              <Link
-                                className="page-link"
-                                to="#"
-                                aria-label="Next"
-                              >
-                                <span aria-hidden="true">
-                                  <svg
-                                    width={12}
-                                    height={12}
-                                    viewBox="0 0 12 12"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
+                                  </Link>
+                                </div>
+                                <div className="card-info">
+                                  <Link
+                                    className="btn btn-label-tag background-3"
+                                    to="#"
                                   >
-                                    <path
-                                      d="M5.99967 10.6666L10.6663 5.99992L5.99968 1.33325M10.6663 5.99992L1.33301 5.99992"
-                                      stroke="white"
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                    />
-                                  </svg>
-                                </span>
-                              </Link>
-                            </li>
-                          </ul>
-                        </nav>
+                                    {blog.category || "General"}
+                                  </Link>
+                                  <div className="card-title">
+                                    <Link
+                                      className="heading-6 neutral-1000"
+                                      to={`/blog-details/${blog.slug}`}
+                                      state={{ slug: blog.slug }}
+                                    >
+                                      {blog.title || "Untitled"}
+                                    </Link>
+                                  </div>
+                                  <div className="card-meta">
+                                    <span className="post-date neutral-1000">
+                                      {formatDate(blog.published_at)}
+                                    </span>
+                                    <span className="post-time neutral-1000">
+                                      {formatReadTime(blog.read_time_min)}
+                                    </span>
+                                    <span className="post-comment neutral-1000">
+                                      {blog.author_name || "Anonymous"}
+                                    </span>
+                                    {blog.views > 0 && (
+                                      <span className="post-views neutral-1000">
+                                        {blog.views} view
+                                        {blog.views > 1 ? "s" : ""}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div className="card-desc">
+                                    <p className="text-md-medium neutral-500">
+                                      {blog.excerpt || "No excerpt available"}
+                                    </p>
+                                  </div>
+                                  <div className="card-program">
+                                    <div className="endtime">
+                                      <div className="card-button">
+                                        <Link
+                                          className="btn btn-gray"
+                                          to={`/blog-details/${blog.slug}`}
+                                          state={{ slug: blog.slug }}
+                                        >
+                                          Keep Reading
+                                        </Link>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                       <div className="col-lg-4">
                         <div className="box-search-style-2">
-                          <form action="#">
-                            <input type="text" placeholder="Search" />
+                          <form onSubmit={(e) => e.preventDefault()}>
+                            <input
+                              type="text"
+                              placeholder="Search blogs..."
+                              value={searchTerm}
+                              onChange={(e) => setSearchTerm(e.target.value)}
+                            />
                             <input
                               className="btn-search-submit"
                               type="submit"
@@ -363,223 +217,111 @@ const BlogList = () => {
                         <div className="box-sidebar-border">
                           <div className="box-head-sidebar">
                             <p className="text-xl-bold neutral-1000">
-                              Trending Now
+                              Categories
                             </p>
                           </div>
                           <div className="box-content-sidebar">
                             <ul className="list-posts">
-                              <li>
-                                <div className="card-post">
-                                  <div className="card-image">
-                                    <Link to="/blog-details">
-                                      <img
-                                        src="/assets/imgs/blog/blog-list/trending.png"
-                                        alt="Maharashtra-cabs"
-                                      />
-                                    </Link>
-                                  </div>
-                                  <div className="card-info">
-                                    <Link
-                                      className="text-md-bold neutral-1000"
-                                      to="/blog-details"
-                                    >
-                                      How to Choose the Best Insurance for Your
-                                      Rental Car
-                                    </Link>
-                                    <p className="text-sm-medium date-post neutral-500">
-                                      18 Sep 2024
-                                    </p>
-                                  </div>
-                                </div>
-                              </li>
-                              <li>
-                                <div className="card-post">
-                                  <div className="card-image">
-                                    <Link to="/blog-details">
-                                      <img
-                                        src="/assets/imgs/blog/blog-list/trending1.png"
-                                        alt="Maharashtra-cabs"
-                                      />
-                                    </Link>
-                                  </div>
-                                  <div className="card-info">
-                                    <Link
-                                      className="text-md-bold neutral-1000"
-                                      to="/blog-details"
-                                    >
-                                      The Advantages of Renting a Car for
-                                      Business Travel
-                                    </Link>
-                                    <p className="text-sm-medium date-post neutral-500">
-                                      18 Sep 2024
-                                    </p>
-                                  </div>
-                                </div>
-                              </li>
-                              <li>
-                                <div className="card-post">
-                                  <div className="card-image">
-                                    <Link to="/blog-details">
-                                      <img
-                                        src="/assets/imgs/blog/blog-list/trending2.png"
-                                        alt="Maharashtra-cabs"
-                                      />
-                                    </Link>
-                                  </div>
-                                  <div className="card-info">
-                                    <Link
-                                      className="text-md-bold neutral-1000"
-                                      to="/blog-details"
-                                    >
-                                      Why Renting a Car Is Ideal for Exploring
-                                      National Parks
-                                    </Link>
-                                    <p className="text-sm-medium date-post neutral-500">
-                                      18 Sep 2024
-                                    </p>
-                                  </div>
-                                </div>
-                              </li>
-                              <li>
-                                <div className="card-post">
-                                  <div className="card-image">
-                                    <Link to="/blog-details">
-                                      <img
-                                        src="/assets/imgs/blog/blog-list/trending3.png"
-                                        alt="Maharashtra-cabs"
-                                      />
-                                    </Link>
-                                  </div>
-                                  <div className="card-info">
-                                    <Link
-                                      className="text-md-bold neutral-1000"
-                                      to="/blog-details"
-                                    >
-                                      How to Extend Your Car Rental Without
-                                      Hassle
-                                    </Link>
-                                    <p className="text-sm-medium date-post neutral-500">
-                                      18 Sep 2024
-                                    </p>
-                                  </div>
-                                </div>
-                              </li>
-                              <li>
-                                <div className="card-post">
-                                  <div className="card-image">
-                                    <Link to="/blog-details">
-                                      <img
-                                        src="/assets/imgs/blog/blog-list/trending4.png"
-                                        alt="Maharashtra-cabs"
-                                      />
-                                    </Link>
-                                  </div>
-                                  <div className="card-info">
-                                    <Link
-                                      className="text-md-bold neutral-1000"
-                                      to="/blog-details"
-                                    >
-                                      The Ultimate Checklist for Returning Your
-                                      Rental Car
-                                    </Link>
-                                    <p className="text-sm-medium date-post neutral-500">
-                                      18 Sep 2024
-                                    </p>
-                                  </div>
-                                </div>
-                              </li>
+                              {Array.from(
+                                new Set(
+                                  blogsRaw
+                                    .filter(
+                                      (b) =>
+                                        b.status === "published" ||
+                                        b.status === "draft"
+                                    )
+                                    .map((b) => b.category)
+                                )
+                              )
+                                .filter(Boolean)
+                                .map((category, index) => (
+                                  <li key={index}>
+                                    <div className="card-post">
+                                      <div className="card-info">
+                                        <Link
+                                          className="text-md-bold neutral-1000"
+                                          to="#"
+                                          onClick={(e) => {
+                                            e.preventDefault();
+                                            setSearchTerm(category);
+                                          }}
+                                        >
+                                          {category}
+                                        </Link>
+                                        <p className="text-sm-medium date-post neutral-500">
+                                          {
+                                            blogsRaw.filter(
+                                              (b) =>
+                                                (b.status === "published" ||
+                                                  b.status === "draft") &&
+                                                b.category === category
+                                            ).length
+                                          }{" "}
+                                          posts
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </li>
+                                ))}
                             </ul>
                           </div>
                         </div>
                         <div className="box-sidebar-border">
                           <div className="box-head-sidebar">
-                            <p className="text-xl-bold neutral-1000">Gallery</p>
+                            <p className="text-xl-bold neutral-1000">
+                              Featured Posts
+                            </p>
                           </div>
                           <div className="box-content-sidebar">
-                            <ul className="list-photo-col-3">
-                              <li>
-                                <Link to="#">
-                                  <img
-                                    src="/assets/imgs/blog/blog-list/cat.png"
-                                    alt="Maharashtra-cabs"
-                                  />
-                                </Link>
-                              </li>
-                              <li>
-                                <Link to="#">
-                                  <img
-                                    src="/assets/imgs/blog/blog-list/cat2.png"
-                                    alt="Maharashtra-cabs"
-                                  />
-                                </Link>
-                              </li>
-                              <li>
-                                <Link to="#">
-                                  <img
-                                    src="/assets/imgs/blog/blog-list/cat3.png"
-                                    alt="Maharashtra-cabs"
-                                  />
-                                </Link>
-                              </li>
-                              <li>
-                                <Link to="#">
-                                  <img
-                                    src="/assets/imgs/blog/blog-list/cat4.png"
-                                    alt="Maharashtra-cabs"
-                                  />
-                                </Link>
-                              </li>
-                              <li>
-                                <Link to="#">
-                                  <img
-                                    src="/assets/imgs/blog/blog-list/cat5.png"
-                                    alt="Maharashtra-cabs"
-                                  />
-                                </Link>
-                              </li>
-                              <li>
-                                <Link to="#">
-                                  <img
-                                    src="/assets/imgs/blog/blog-list/cat6.png"
-                                    alt="Maharashtra-cabs"
-                                  />
-                                </Link>
-                              </li>
-                              <li>
-                                <Link to="#">
-                                  <img
-                                    src="/assets/imgs/blog/blog-list/cat7.png"
-                                    alt="Maharashtra-cabs"
-                                  />
-                                </Link>
-                              </li>
-                              <li>
-                                <Link to="#">
-                                  <img
-                                    src="/assets/imgs/blog/blog-list/cat8.png"
-                                    alt="Maharashtra-cabs"
-                                  />
-                                </Link>
-                              </li>
-                              <li>
-                                <Link to="#">
-                                  <img
-                                    src="/assets/imgs/blog/blog-list/cat.png"
-                                    alt="Maharashtra-cabs"
-                                  />
-                                </Link>
-                              </li>
+                            <ul className="list-posts">
+                              {blogsRaw
+                                .filter(
+                                  (blog) =>
+                                    (blog.status === "published" ||
+                                      blog.status === "draft") &&
+                                    blog.is_featured
+                                )
+                                .slice(0, 5)
+                                .map((blog) => (
+                                  <li key={blog.id}>
+                                    <div className="card-post">
+                                      <div className="card-image">
+                                        <Link
+                                          to={`/blog-details/${blog.slug}`}
+                                          state={{ slug: blog.slug }}
+                                        >
+                                          <img
+                                            src={
+                                              blog.cover_image
+                                                ? `https://maharashtracabs.com/maharashtracab_backend/public/${blog.cover_image}`
+                                                : "/assets/imgs/blog/blog-list/default-blog.jpg"
+                                            }
+                                            alt={blog.title || "Blog post"}
+                                            style={{
+                                              width: "60px",
+                                              height: "60px",
+                                              objectFit: "cover",
+                                            }}
+                                          />
+                                        </Link>
+                                      </div>
+                                      <div className="card-info">
+                                        <Link
+                                          className="text-md-bold neutral-1000"
+                                          to={`/blog-details/${blog.slug}`}
+                                          state={{ slug: blog.slug }}
+                                        >
+                                          {blog.title || "Untitled"}
+                                        </Link>
+                                        <p className="text-sm-medium date-post neutral-500">
+                                          {formatDate(blog.published_at)}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </li>
+                                ))}
                             </ul>
                           </div>
-                        </div>
-                        <div className="sidebar-banner">
-                          <Link to="#">
-                            <img
-                              className="rounded-3 w-100"
-                              src="/assets/imgs/blog/blog-list/banner-ads.png"
-                              alt="Maharashtra-cabs"
-                            />
-                          </Link>
                         </div>
                       </div>
                     </div>

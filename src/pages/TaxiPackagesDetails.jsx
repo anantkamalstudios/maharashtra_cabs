@@ -1,47 +1,10 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import taxiPackage from "../data/taxiPackages";
 import Layout from "../components/layout/Layout";
 import PopularRoutes from "../components/sections/PopularRoutes";
-
-const SlickArrowLeft = ({ currentSlide, slideCount, ...props }) => (
-  <button
-    {...props}
-    className={
-      "slick-prev slick-arrow" + (currentSlide === 0 ? " slick-disabled" : "")
-    }
-    type="button"
-  >
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-      <path
-        d="M7.99992 3.33325L3.33325 7.99992M3.33325 7.99992L7.99992 12.6666M3.33325 7.99992H12.6666"
-        stroke=""
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  </button>
-);
-
-const SlickArrowRight = ({ currentSlide, slideCount, ...props }) => (
-  <button
-    {...props}
-    className={
-      "slick-next slick-arrow" +
-      (currentSlide === slideCount - 1 ? " slick-disabled" : "")
-    }
-    type="button"
-  >
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-      <path
-        d="M7.99992 12.6666L12.6666 7.99992L7.99992 3.33325M12.6666 7.99992L3.33325 7.99992"
-        stroke=""
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  </button>
-);
+import useHome from "../hooks/useHome";
+import { RingLoader } from "react-spinners";
+import { FaPersonWalkingLuggage } from "react-icons/fa6";
 
 const TaxiPackagesDetails = () => {
   const { slug } = useParams();
@@ -50,8 +13,10 @@ const TaxiPackagesDetails = () => {
   const [slider1, setSlider1] = useState(null);
   const [slider2, setSlider2] = useState(null);
   const [isAccordion, setIsAccordion] = useState(null);
+  const { data, loading, error } = useHome();
 
-  const offer = taxiPackage.find((item) => item.slug === slug);
+  const taxiPackagesRaw = data?.taxi_package || [];
+  const offer = taxiPackagesRaw.find((item) => item.slug === slug);
 
   useEffect(() => {
     setNav1(slider1);
@@ -62,24 +27,163 @@ const TaxiPackagesDetails = () => {
     setIsAccordion((prevState) => (prevState === key ? null : key));
   };
 
-  if (!offer) {
+  if (loading) {
     return (
       <Layout footerStyle={1}>
-        <div className="container py-5">
-          <h2>Offer not found</h2>
+        <div
+          style={{
+            height: "100vh",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            background: "#fff",
+          }}
+        >
+          <RingLoader size={120} color="#3583e8ff" />
         </div>
       </Layout>
     );
   }
+
+  if (error) {
+    return (
+      <Layout footerStyle={1}>
+        <div className="container py-5">
+          <h2>Failed to load data. Please try again.</h2>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (!offer) {
+    return (
+      <Layout footerStyle={1}>
+        <div className="container py-5">
+          <h2>Taxi package not found</h2>
+        </div>
+      </Layout>
+    );
+  }
+
+  const formatValue = (value) => {
+    if (value === null || value === undefined || value === "") return "N/A";
+    return value;
+  };
+
+  const formatKilometers = (km) => {
+    if (!km) return "N/A";
+    return `${km} km`;
+  };
+
+  const formatEngineCapacity = (capacity) => {
+    if (!capacity) return "N/A";
+    return `${capacity}L`;
+  };
+
+  const formatSeats = (seats) => {
+    if (!seats) return "N/A";
+    return `${seats} seats`;
+  };
+
+  const formatBags = (bags) => {
+    if (!bags) return "N/A";
+    return `${bags} Large bags`;
+  };
+
+  const formatDoors = (doors) => {
+    if (!doors) return "N/A";
+    return `${doors} Doors`;
+  };
+
+  const parseFaqs = (faqsData) => {
+    if (!faqsData) return [];
+
+    // If it's already an object/array, return it directly
+    if (typeof faqsData === "object") {
+      // If it has question/answer structure, convert to array format
+      if (faqsData.question && faqsData.answer) {
+        return [{ question: faqsData.question, answer: faqsData.answer }];
+      }
+      // If it's an array, return as is
+      if (Array.isArray(faqsData)) {
+        return faqsData;
+      }
+      // If it's an object with numeric keys, convert to array
+      if (typeof faqsData === "object" && !Array.isArray(faqsData)) {
+        const keys = Object.keys(faqsData);
+        if (keys.length > 0 && keys.every((key) => !isNaN(key))) {
+          return Object.values(faqsData);
+        }
+      }
+    }
+
+    // If it's a string, try to parse as JSON
+    if (typeof faqsData === "string") {
+      try {
+        const parsed = JSON.parse(faqsData);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+
+    return [];
+  };
+
+  const parseIncludedInPrice = (includedData) => {
+    if (!includedData) return [];
+
+    // If it's already an object/array, return it directly
+    if (typeof includedData === "object") {
+      // If it's an array, return as is
+      if (Array.isArray(includedData)) {
+        return includedData;
+      }
+      // If it's an object with numeric keys, convert to array
+      if (typeof includedData === "object" && !Array.isArray(includedData)) {
+        const keys = Object.keys(includedData);
+        if (keys.length > 0 && keys.every((key) => !isNaN(key))) {
+          return Object.values(includedData);
+        }
+      }
+      // If it's a single object, try to extract meaningful values
+      if (typeof includedData === "object") {
+        const values = Object.values(includedData);
+        if (values.length > 0) {
+          return values.filter((val) => val && typeof val === "string");
+        }
+      }
+    }
+
+    // If it's a string, try to parse as JSON
+    if (typeof includedData === "string") {
+      try {
+        const parsed = JSON.parse(includedData);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+
+    return [];
+  };
+
+  const faqs = parseFaqs(offer.faqs);
+  const includedInPrice = parseIncludedInPrice(offer.included_in_price);
+
   return (
-    <div>
-      <>
+    <>
+      <div className="background-body">
         <div className="container">
           <div className="row" style={{ marginTop: "6rem" }}>
             <div className="col-lg-4">
               <div className="text-center py-4">
                 <img
-                  src={offer.image}
+                  src={
+                    offer.image
+                      ? `https://maharashtracabs.com/maharashtracab_backend/public/${offer.image}`
+                      : "/assets/imgs/page/car/default-car.jpg"
+                  }
                   alt={offer.title}
                   className="img-fluid d-block mx-auto my-3"
                   style={{ maxHeight: "500px", objectFit: "contain" }}
@@ -88,7 +192,29 @@ const TaxiPackagesDetails = () => {
             </div>
             <div className="col-lg-8 mt-40">
               <div className="box-feature-car">
-                <h4 className="my-3 neutral-1000">{offer.title}</h4>
+                <div className="d-flex justify-content-between align-items-start mb-3">
+                  <h4 className="my-0 neutral-1000">
+                    {offer.title || offer.heading || "Taxi Package"}
+                  </h4>
+                  <a
+                    href={`https://wa.me/${
+                      offer.contact_no || "8208321149"
+                    }?text=I'm interested in this taxi package: ${
+                      offer.title || offer.heading || "Taxi Package"
+                    }`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-brand-2 text-nowrap px-4 py-2"
+                    style={{
+                      backgroundColor: "orange",
+                      color: "black",
+                      border: "none",
+                    }}
+                  >
+                    <FaPersonWalkingLuggage size={20} className="me-2" />
+                    Book Now
+                  </a>
+                </div>
                 <div className="list-feature-car">
                   <div className="item-feature-car w-md-25">
                     <div className="item-feature-car-inner">
@@ -99,7 +225,9 @@ const TaxiPackagesDetails = () => {
                         />
                       </div>
                       <div className="feature-info">
-                        <p className="text-md-medium neutral-1000">56,500</p>
+                        <p className="text-md-medium neutral-1000">
+                          {formatKilometers(offer.kilometers)}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -112,7 +240,9 @@ const TaxiPackagesDetails = () => {
                         />
                       </div>
                       <div className="feature-info">
-                        <p className="text-md-medium neutral-1000">Diesel</p>
+                        <p className="text-md-medium neutral-1000">
+                          {formatValue(offer.fuel_type)}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -125,7 +255,9 @@ const TaxiPackagesDetails = () => {
                         />
                       </div>
                       <div className="feature-info">
-                        <p className="text-md-medium neutral-1000">Automatic</p>
+                        <p className="text-md-medium neutral-1000">
+                          {formatValue(offer.transmission)}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -138,7 +270,9 @@ const TaxiPackagesDetails = () => {
                         />
                       </div>
                       <div className="feature-info">
-                        <p className="text-md-medium neutral-1000">7 seats</p>
+                        <p className="text-md-medium neutral-1000">
+                          {formatSeats(offer.seats)}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -152,7 +286,7 @@ const TaxiPackagesDetails = () => {
                       </div>
                       <div className="feature-info">
                         <p className="text-md-medium neutral-1000">
-                          3 Large bags
+                          {formatBags(offer.bags)}
                         </p>
                       </div>
                     </div>
@@ -166,7 +300,9 @@ const TaxiPackagesDetails = () => {
                         />
                       </div>
                       <div className="feature-info">
-                        <p className="text-md-medium neutral-1000">SUVs</p>
+                        <p className="text-md-medium neutral-1000">
+                          {formatValue(offer.car_type)}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -179,7 +315,9 @@ const TaxiPackagesDetails = () => {
                         />
                       </div>
                       <div className="feature-info">
-                        <p className="text-md-medium neutral-1000">4 Doors</p>
+                        <p className="text-md-medium neutral-1000">
+                          {formatDoors(offer.doors)}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -192,7 +330,9 @@ const TaxiPackagesDetails = () => {
                         />
                       </div>
                       <div className="feature-info">
-                        <p className="text-md-medium neutral-1000">2.5L</p>
+                        <p className="text-md-medium neutral-1000">
+                          {formatEngineCapacity(offer.engine_capacity)}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -237,28 +377,14 @@ const TaxiPackagesDetails = () => {
                     id="collapseOverview"
                   >
                     <div className="card card-body">
-                      <p>
-                        Elevate your Las Vegas experience to new heights with a
-                        journey aboard The High Roller at The LINQ. As the
-                        tallest observation wheel in the world, standing at an
-                        impressive 550 feet tall, The High Roller offers a
-                        bird's-eye perspective of the iconic Las Vegas Strip and
-                        its surrounding desert landscape. From the moment you
-                        step into one of the spacious cabins, you'll be
-                        transported on a mesmerizing adventure, where every turn
-                        offers a new and breathtaking vista of the vibrant city
-                        below.
-                      </p>
-                      <p>
-                        Whether you're a first-time visitor or a seasoned Las
-                        Vegas aficionado, The High Roller promises an
-                        unparalleled experience that will leave you in awe. With
-                        its climate-controlled cabins and immersive audio
-                        commentary, this attraction provides a unique
-                        opportunity to see Las Vegas from a whole new
-                        perspective, while learning about its rich history and
-                        famous landmarks along the way.
-                      </p>
+                      {offer.overview ? (
+                        <div
+                          className="neutral-800"
+                          dangerouslySetInnerHTML={{ __html: offer.overview }}
+                        />
+                      ) : (
+                        <p>No overview available for this package.</p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -298,12 +424,15 @@ const TaxiPackagesDetails = () => {
                     id="collapseItinerary"
                   >
                     <div className="card card-body">
-                      <ul className="list-checked-green">
-                        <li>Free cancellation up to 48 hours before pick-up</li>
-                        <li>Collision Damage Waiver with $700 deductible</li>
-                        <li>Theft Protection with ₫66,926,626 excess</li>
-                        <li>Unlimited mileage</li>
-                      </ul>
+                      {includedInPrice.length > 0 ? (
+                        <ul className="list-checked-green">
+                          {includedInPrice.map((item, index) => (
+                            <li key={index}>{item}</li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p>No included items listed for this package.</p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -343,52 +472,31 @@ const TaxiPackagesDetails = () => {
                     id="collapseQuestion"
                   >
                     <div className="card card-body">
-                      <div className="list-questions">
-                        <div className="item-question">
-                          <div className="head-question">
-                            <p className="text-md-bold neutral-1000">
-                              Is The High Roller suitable for all ages?
-                            </p>
-                          </div>
-                          <div className="content-question">
-                            <p className="text-sm-medium neutral-800">
-                              Absolutely! The High Roller offers a
-                              family-friendly experience suitable for visitors
-                              of all ages. Children must be accompanied by an
-                              adult.
-                            </p>
-                          </div>
+                      {faqs.length > 0 ? (
+                        <div className="list-questions">
+                          {faqs.map((faq, index) => (
+                            <div
+                              key={index}
+                              className={`item-question ${
+                                index === 0 ? "active" : ""
+                              }`}
+                            >
+                              <div className="head-question">
+                                <p className="text-md-bold neutral-1000">
+                                  {faq.question || "Question"}
+                                </p>
+                              </div>
+                              <div className="content-question">
+                                <p className="text-sm-medium neutral-800">
+                                  {faq.answer || "Answer"}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
                         </div>
-                        <div className="item-question active">
-                          <div className="head-question">
-                            <p className="text-md-bold neutral-1000">
-                              Can I bring food or drinks aboard The High Roller?
-                            </p>
-                          </div>
-                          <div className="content-question">
-                            <p className="text-sm-medium neutral-800">
-                              Outside food and beverages are not permitted on
-                              The High Roller. However, there are nearby dining
-                              options at The LINQ Promenade where you can enjoy
-                              a meal before or after your ride.
-                            </p>
-                          </div>
-                        </div>
-                        <div className="item-question">
-                          <div className="head-question">
-                            <p className="text-md-bold neutral-1000">
-                              Is The High Roller wheelchair accessible?
-                            </p>
-                          </div>
-                          <div className="content-question">
-                            <p className="text-sm-medium neutral-800">
-                              es, The High Roller cabins are wheelchair
-                              accessible, making it possible for everyone to
-                              enjoy the breathtaking views of Las Vegas.
-                            </p>
-                          </div>
-                        </div>
-                      </div>
+                      ) : (
+                        <p>No FAQs available for this package.</p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -398,8 +506,8 @@ const TaxiPackagesDetails = () => {
 
           <PopularRoutes />
         </div>
-      </>
-    </div>
+      </div>
+    </>
   );
 };
 

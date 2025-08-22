@@ -11,7 +11,7 @@ export default function WhatsAppButton() {
       }}
     >
       <Link
-        to="https://wa.me/9370098337"
+        to="https://wa.me/8208321149"
         target="_blank"
         rel="noopener noreferrer"
       >

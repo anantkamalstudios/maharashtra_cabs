@@ -72,7 +72,8 @@ const TopOffers = ({ topOffers }) => {
                             <div className="card-title">
                               <Link
                                 className="heading-6 neutral-1000"
-                                to={`/top-offers/${offer.slug}`}
+                                to="#"
+                                onClick={(e) => e.preventDefault()}
                               >
                                 {offer.title}
                               </Link>
@@ -85,7 +86,7 @@ const TopOffers = ({ topOffers }) => {
                               </div>
                             </div>
                             <a
-                              href={`https://wa.me/9370098337?text=I'm%20interested%20in%20this%20package:%20${offer.slug}`}
+                              href={`https://wa.me/8208321149?text=I'm%20interested%20in%20this%20package:%20${offer.slug}`}
                               target="_blank"
                               rel="noopener noreferrer"
                             >

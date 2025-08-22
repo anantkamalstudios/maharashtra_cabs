@@ -1,5 +1,6 @@
 import React from "react";
 import { useLoading } from "../context/LoadingContext.jsx";
+import { RingLoader } from "react-spinners";
 
 const PageLoader = () => {
   const { isLoading } = useLoading();
@@ -9,7 +10,17 @@ const PageLoader = () => {
   return (
     <div className="page-loader">
       <div className="loader-blur-bg" />
-      <img src="/loadingGif2.gif" alt="Loading..." className="loader-gif" />
+      <div
+        style={{
+          height: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          background: "#fff",
+        }}
+      >
+        <RingLoader size={120} color="#3583e8ff" />
+      </div>
     </div>
   );
 };

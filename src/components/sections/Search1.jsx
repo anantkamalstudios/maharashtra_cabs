@@ -89,7 +89,10 @@ export default function Search1() {
       </div>
 
       <div className="box-search-advance background-card wow fadeIn">
-        <HeroSearch />
+        <HeroSearch
+          activeTab={activeTab}
+          activeAirportOption={activeAirportOption}
+        />
       </div>
     </div>
   );

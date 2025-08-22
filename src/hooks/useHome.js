@@ -14,7 +14,6 @@ function useHome() {
         setLoading(false);
       })
       .catch((err) => {
-        console.error("API Error:", err);
         setError(true);
         setLoading(false);
       });

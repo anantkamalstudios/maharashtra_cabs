@@ -170,7 +170,7 @@ export default function Offcanvas({ isOffcanvas, handleOffcanvas }) {
                   Hours: 8:00 - 17:00, Mon - Sat
                 </p>
                 <p className="email-2 text-md-medium neutral-1000">
-                  support@maharashtra-cabs.com
+                  contact@maharashtracabs.com
                 </p>
               </div>
             </div>

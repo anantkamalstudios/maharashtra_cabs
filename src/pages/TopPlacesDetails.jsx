@@ -3,9 +3,11 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Layout from "../components/layout/Layout";
-import topPlaces from "../data/topPlaces";
 import PopularRoutes from "../components/sections/PopularRoutes";
 import { Link } from "react-router-dom";
+import useHome from "../hooks/useHome";
+import { RingLoader } from "react-spinners";
+import { FiSearch } from "react-icons/fi";
 
 const SlickArrowLeft = ({ currentSlide, slideCount, ...props }) => (
   <button
@@ -66,43 +68,57 @@ const TopPlacesDetails = () => {
   const [slider1, setSlider1] = useState(null);
   const [slider2, setSlider2] = useState(null);
   const [isAccordion, setIsAccordion] = useState(null);
+  const { data, loading, error } = useHome();
 
   useEffect(() => {
     setNav1(slider1);
     setNav2(slider2);
   }, [slider2, slider1]);
 
-  const settingsMain = {
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    arrows: true,
-    fade: false,
-    prevArrow: <SlickArrowLeft />,
-    nextArrow: <SlickArrowRight />,
-  };
-
-  const settingsThumbs = {
-    slidesToShow: 6,
-    slidesToScroll: 1,
-    asNavFor: nav1,
-    dots: false,
-    focusOnSelect: true,
-    vertical: false,
-    responsive: [
-      { breakpoint: 1200, settings: { slidesToShow: 5 } },
-      { breakpoint: 1024, settings: { slidesToShow: 4 } },
-      { breakpoint: 700, settings: { slidesToShow: 3 } },
-      { breakpoint: 480, settings: { slidesToShow: 2 } },
-    ],
-  };
-
   const handleAccordion = (key) => {
     setIsAccordion((prevState) => (prevState === key ? null : key));
   };
 
-  const offer = topPlaces.find((item) => item.slug === slug);
+  if (loading) {
+    return (
+      <Layout footerStyle={1}>
+        <div
+          style={{
+            height: "100vh",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            background: "#fff",
+          }}
+        >
+          <RingLoader size={120} color="#3583e8ff" />
+        </div>
+      </Layout>
+    );
+  }
 
-  if (!offer) {
+  if (error) {
+    return (
+      <Layout footerStyle={1}>
+        <div className="container py-5">
+          <h2>Failed to load data. Please try again.</h2>
+        </div>
+      </Layout>
+    );
+  }
+
+  const placesRaw = data?.top_place || [];
+  // Only content rows have title when heading is null
+  const place =
+    placesRaw.find(
+      (item) =>
+        item.heading === null &&
+        (item.slug ||
+          (item.title && item.title.toLowerCase().replace(/\s+/g, "-"))) ===
+          slug
+    ) || placesRaw.find((item) => item.slug === slug);
+
+  if (!place) {
     return (
       <Layout footerStyle={1}>
         <div className="container py-5">
@@ -111,6 +127,25 @@ const TopPlacesDetails = () => {
       </Layout>
     );
   }
+
+  const imageUrl = place.image
+    ? `https://maharashtracabs.com/maharashtracab_backend/public/${place.image}`
+    : "/assets/imgs/blog/blog-list/default-blog.jpg";
+  const posterUrl = place.poster
+    ? `https://maharashtracabs.com/maharashtracab_backend/public/${place.poster}`
+    : "/assets/imgs/blog/blog-list/banner-ads.png";
+
+  const bestClicks = Array.isArray(place.best_clicks)
+    ? place.best_clicks
+    : (() => {
+        // try parse JSON if string
+        try {
+          const parsed = JSON.parse(place.best_clicks || "[]");
+          return Array.isArray(parsed) ? parsed : [];
+        } catch {
+          return [];
+        }
+      })();
 
   return (
     <div>
@@ -155,28 +190,14 @@ const TopPlacesDetails = () => {
                     id="collapseOverview"
                   >
                     <div className="card card-body">
-                      <p>
-                        Elevate your Las Vegas experience to new heights with a
-                        journey aboard The High Roller at The LINQ. As the
-                        tallest observation wheel in the world, standing at an
-                        impressive 550 feet tall, The High Roller offers a
-                        bird's-eye perspective of the iconic Las Vegas Strip and
-                        its surrounding desert landscape. From the moment you
-                        step into one of the spacious cabins, you'll be
-                        transported on a mesmerizing adventure, where every turn
-                        offers a new and breathtaking vista of the vibrant city
-                        below.
-                      </p>
-                      <p>
-                        Whether you're a first-time visitor or a seasoned Las
-                        Vegas aficionado, The High Roller promises an
-                        unparalleled experience that will leave you in awe. With
-                        its climate-controlled cabins and immersive audio
-                        commentary, this attraction provides a unique
-                        opportunity to see Las Vegas from a whole new
-                        perspective, while learning about its rich history and
-                        famous landmarks along the way.
-                      </p>
+                      {place.overview ? (
+                        <div
+                          className="neutral-800 top-offers-overview"
+                          dangerouslySetInnerHTML={{ __html: place.overview }}
+                        />
+                      ) : (
+                        <p>No overview available.</p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -185,16 +206,30 @@ const TopPlacesDetails = () => {
             <div className="col-lg-4">
               <div className="text-center py-4">
                 <img
-                  src={offer.image}
-                  alt={offer.title}
+                  src={imageUrl}
+                  alt={place.title}
                   className="img-fluid d-block mx-auto my-3"
                   style={{ maxHeight: "500px", objectFit: "contain" }}
                 />
               </div>
               <div className="box-search-style-2">
-                <form action="#">
-                  <input type="text" placeholder="Search" />
-                  <input className="btn-search-submit" type="submit" />
+                <form onSubmit={(e) => e.preventDefault()}>
+                  <div className="input-group" style={{ margin: "0 auto" }}>
+                    <input
+                      type="text"
+                      placeholder="Search..."
+                      className="form-control"
+                      aria-label="Search"
+                    />
+                    <button
+                      type="submit"
+                      className="btn btn-primary"
+                      aria-label="Search"
+                      style={{ zIndex: 1 }}
+                    >
+                      <FiSearch size={18} color="#fff" />
+                    </button>
+                  </div>
                 </form>
               </div>
               <div className="box-sidebar-border">
@@ -203,86 +238,30 @@ const TopPlacesDetails = () => {
                 </div>
                 <div className="box-content-sidebar">
                   <ul className="list-photo-col-3">
-                    <li>
-                      <Link href="#">
-                        <img
-                          src="/assets/imgs/blog/blog-list/cat.png"
-                          alt="Maharashtra-cabs"
-                        />
-                      </Link>
-                    </li>
-                    <li>
-                      <Link href="#">
-                        <img
-                          src="/assets/imgs/blog/blog-list/cat2.png"
-                          alt="Maharashtra-cabs"
-                        />
-                      </Link>
-                    </li>
-                    <li>
-                      <Link href="#">
-                        <img
-                          src="/assets/imgs/blog/blog-list/cat3.png"
-                          alt="Maharashtra-cabs"
-                        />
-                      </Link>
-                    </li>
-                    <li>
-                      <Link href="#">
-                        <img
-                          src="/assets/imgs/blog/blog-list/cat4.png"
-                          alt="Maharashtra-cabs"
-                        />
-                      </Link>
-                    </li>
-                    <li>
-                      <Link href="#">
-                        <img
-                          src="/assets/imgs/blog/blog-list/cat5.png"
-                          alt="Maharashtra-cabs"
-                        />
-                      </Link>
-                    </li>
-                    <li>
-                      <Link href="#">
-                        <img
-                          src="/assets/imgs/blog/blog-list/cat6.png"
-                          alt="Maharashtra-cabs"
-                        />
-                      </Link>
-                    </li>
-                    <li>
-                      <Link href="#">
-                        <img
-                          src="/assets/imgs/blog/blog-list/cat7.png"
-                          alt="Maharashtra-cabs"
-                        />
-                      </Link>
-                    </li>
-                    <li>
-                      <Link href="#">
-                        <img
-                          src="/assets/imgs/blog/blog-list/cat8.png"
-                          alt="Maharashtra-cabs"
-                        />
-                      </Link>
-                    </li>
-                    <li>
-                      <Link href="#">
-                        <img
-                          src="/assets/imgs/blog/blog-list/cat.png"
-                          alt="Maharashtra-cabs"
-                        />
-                      </Link>
-                    </li>
+                    {bestClicks.length === 0 && (
+                      <li className="text-muted">
+                        No popular photos available.
+                      </li>
+                    )}
+                    {bestClicks.map((img, idx) => (
+                      <li key={idx}>
+                        <Link to="#">
+                          <img
+                            src={`https://maharashtracabs.com/maharashtracab_backend/public/${img}`}
+                            alt={`Popular ${idx + 1}`}
+                            loading="lazy"
+                          />
+                        </Link>
+                      </li>
+                    ))}
                   </ul>
                 </div>
               </div>
               <div className="sidebar-banner">
-                <Link href="#">
+                <Link to="#">
                   <img
                     className="rounded-3 w-100"
-                    src="/assets/imgs/blog/blog-list/banner-ads.png"
+                    src={posterUrl}
                     alt="Maharashtra-cabs"
                   />
                 </Link>

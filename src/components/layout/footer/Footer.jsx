@@ -35,14 +35,13 @@ export default function Footer() {
                 </Link>
                 <div className="box-info-contact mt-0">
                   <p className="text-md neutral-400 icon-address">
-                    2356 Oakwood Drive, Suite 18, San Francisco, California
-                    94111, US
+                    Satpur Colony, Nashik Maharastra, India 422010
                   </p>
-                  <p className="text-md neutral-400 icon-worktime">
+                  {/* <p className="text-md neutral-400 icon-worktime">
                     Hours: 8:00 - 17:00, Mon - Sat
-                  </p>
+                  </p> */}
                   <p className="text-md neutral-400 icon-email">
-                    support@maharashtra-cabs.com
+                    contact@maharashtracabs.com
                   </p>
                 </div>
                 <div className="box-need-help">
@@ -54,7 +53,7 @@ export default function Footer() {
                     className="heading-6 phone-support"
                     to="/tel:+12225553399"
                   >
-                    +1 222-555-33-99
+                    +918208321149
                   </Link>
                 </div>
               </div>
@@ -76,7 +75,7 @@ export default function Footer() {
                   <Link to="/contact">Contact Us</Link>
                 </li>
                 <li>
-                  <Link to="/career">Careers</Link>
+                  <Link to="/career">Gallery</Link>
                 </li>
               </ul>
             </div>
@@ -106,7 +105,7 @@ export default function Footer() {
             <div className="row align-items-center justify-content-center">
               <div className="col-md-6 text-md-start text-center mb-20">
                 <p className="text-sm color-white">
-                  © {new Date().getFullYear()} Maharashtra-cabs Inc. All rights
+                  © {new Date().getFullYear()} Maharashtra Cabs. All rights
                   reserved.
                 </p>
               </div>
